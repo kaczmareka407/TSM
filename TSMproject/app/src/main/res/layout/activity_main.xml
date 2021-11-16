@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,14 +16,74 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />-->
+
+
+    <Button
+        android:id="@+id/button_fill"
+        android:layout_width="540px"
+        android:layout_height="300px"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100px"
+
+
+        android:clickable="true"
+        android:contextClickable="false"
+        android:drawableBottom="@color/teal_200"
+        android:focusable="true"
+
+        android:fontFamily="monospace"
+        android:text="FILL"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textIsSelectable="true"
+        android:textSize="100px"
+
+
+        android:textStyle="bold"
+        app:backgroundTint="#004400"
+        app:cornerRadius="20dp"
+        app:strokeColor="#003300"
+        app:strokeWidth="8dp" />
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/button_water"
+        android:layout_width="540px"
+        android:layout_height="300px"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100px"
+
+
+        android:clickable="true"
+        android:contextClickable="false"
+        android:drawableBottom="@color/teal_200"
+        android:focusable="true"
+
+        android:fontFamily="monospace"
+        android:text="WATER"
+        android:textAlignment="center"
+        android:textAllCaps="true"
+        android:textIsSelectable="true"
+        android:textSize="100px"
+
+        android:textStyle="bold"
+        app:backgroundTint="#004400"
+        app:cornerRadius="20dp"
+        app:strokeColor="#003300"
+        app:strokeWidth="8dp" />
+        tools:ignore="HardcodedText" />
+
     <ImageView
         android:id="@+id/image"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@null"
         app:srcCompat="@drawable/flower_example"
-        tools:ignore="ImageContrastCheck,ImageContrastCheck"
-        android:contentDescription="@null" />
+        tools:ignore="ImageContrastCheck,ImageContrastCheck" />
+
     <ProgressBar
         android:id="@+id/pb"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
@@ -30,8 +91,6 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         tools:ignore="MissingConstraints" />
-
-
 
 
 </RelativeLayout>
