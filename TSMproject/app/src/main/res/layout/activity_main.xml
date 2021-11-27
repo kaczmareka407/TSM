@@ -50,7 +50,7 @@
         tools:ignore="HardcodedText" />
 
     <Button
-        android:id="@+id/button_water"
+        android:id="@+id/button_magic_water"
         android:layout_width="540px"
         android:layout_height="300px"
         android:layout_above="@id/adView"
@@ -59,11 +59,12 @@
 
         android:clickable="true"
         android:contextClickable="false"
+        android:onClick="magicWater"
         android:drawableBottom="@color/teal_200"
-        android:focusable="true"
+
 
         android:fontFamily="monospace"
-        android:text="WATER"
+        android:text="MAGIC WATER"
         android:textAlignment="center"
         android:textAllCaps="true"
         android:textIsSelectable="true"

@@ -1,29 +1,29 @@
 package com.example.tsmproject;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnUserEarnedRewardListener {
 
     public static final String LAST_CLOSE_COUNTER_VALUE = "lastCloseCounterValue";
     public static final String LAST_CLOSE_DATE = "lastCloseDate";
@@ -32,8 +32,12 @@ public class MainActivity extends AppCompatActivity {
 
     private final float healthBarRGB[] = {0, 1.f, 0};
 
+    private RewardedInterstitialAd rewardedInterstitialAd;
+
+
     ProgressBar pb;
     AdView adView;
+    AdRequest adRequest;
     int counter = 99;
 
     SharedPreferences sharedPreferences;
@@ -46,8 +50,16 @@ public class MainActivity extends AppCompatActivity {
         adView = (AdView) findViewById(R.id.adView);
 
         MobileAds.initialize(this);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
+
+
+        RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest, new RewardedInterstitialAdLoadCallback(){
+            @Override
+            public void onRewardedInterstitialAdLoaded(@NonNull RewardedInterstitialAd ad) {
+                rewardedInterstitialAd = ad;
+            }
+        });
 
         sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE);
 
@@ -141,6 +153,18 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    
 
+
+
+    public void magicWater(View view) {
+        rewardedInterstitialAd.show(this,this);
+        adRequest = new AdRequest.Builder().build();
+    }
+
+
+    @Override
+    public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+//        TIME_PERIOD = 10000;
+        System.out.println("NAGRODA");
+    }
 }
