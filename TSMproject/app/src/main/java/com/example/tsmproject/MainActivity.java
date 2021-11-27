@@ -53,13 +53,8 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
+        loadAd();
 
-        RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest, new RewardedInterstitialAdLoadCallback(){
-            @Override
-            public void onRewardedInterstitialAdLoaded(@NonNull RewardedInterstitialAd ad) {
-                rewardedInterstitialAd = ad;
-            }
-        });
 
         sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE);
 
@@ -153,18 +148,25 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         );
     }
 
-
-
+    private void loadAd() {
+        RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest, new RewardedInterstitialAdLoadCallback(){
+            @Override
+            public void onRewardedInterstitialAdLoaded(@NonNull RewardedInterstitialAd ad) {
+                rewardedInterstitialAd = ad;
+            }
+        });
+    }
 
     public void magicWater(View view) {
         rewardedInterstitialAd.show(this,this);
         adRequest = new AdRequest.Builder().build();
+        loadAd();
     }
-
 
     @Override
     public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
 //        TIME_PERIOD = 10000;
         System.out.println("NAGRODA");
     }
+
 }
