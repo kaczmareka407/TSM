@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int TIME_PERIOD = 100;
     public static final String MY_PREFS = "myPrefs";
 
-    private final float healthBarRGB[] = {0, 255, 0};
+    private final float healthBarRGB[] = {0, 1.f, 0};
 
     ProgressBar pb;
     int counter = 99;
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 //                    t.cancel();
                     counter = 99;
                     healthBarRGB[0] = 0;
-                    healthBarRGB[1] = 255;
+                    healthBarRGB[1] = 1.f;
                     //roslinka zdycha
                 } else {
                     counter--;
@@ -122,17 +122,10 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateHPBarColor() {
-        if (counter < 25) {
-            healthBarRGB[1] = 128 * ((counter % 25.f)/25);
-        } else if (counter < 50) {
-            healthBarRGB[0] = 255 - (128 * ((counter % 25.f)/25));
-        } else if (counter < 75) {
-            healthBarRGB[1] = 128 + (128 * ((counter % 25.f)/25));
-        } else {
-            healthBarRGB[0] = 128 - (128 * ((counter % 25.f)/25));
-        }
+        healthBarRGB[0] = 1 - (counter/100.f);
+        healthBarRGB[1] = counter/100.f;
         pb.getProgressDrawable().setColorFilter(
-                Color.valueOf(healthBarRGB[0]/255.f, healthBarRGB[1]/255.f, healthBarRGB[2]/255.f,1.f).toArgb(),
+                Color.valueOf(healthBarRGB[0], healthBarRGB[1], healthBarRGB[2],1.f).toArgb(),
                 android.graphics.PorterDuff.Mode.SRC_IN
         );
     }
