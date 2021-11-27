@@ -10,6 +10,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private final float healthBarRGB[] = {0, 1.f, 0};
 
     ProgressBar pb;
+    AdView adView;
     int counter = 99;
 
     SharedPreferences sharedPreferences;
@@ -37,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        adView = (AdView) findViewById(R.id.adView);
+
+        MobileAds.initialize(this);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
 
         sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE);
 
@@ -129,5 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 android.graphics.PorterDuff.Mode.SRC_IN
         );
     }
+
+    
 
 }
