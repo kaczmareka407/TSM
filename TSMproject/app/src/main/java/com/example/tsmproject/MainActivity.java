@@ -1,14 +1,21 @@
 package com.example.tsmproject;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,11 +23,13 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String LAST_CLOSE_COUNTER_VALUE = "lastCloseCounterValue";
     public static final String LAST_CLOSE_DATE = "lastCloseDate";
-    public static final int TIME_PERIOD = 2000;
+    public static final int TIME_PERIOD = 100;
     public static final String MY_PREFS = "myPrefs";
 
+    private final float healthBarRGB[] = {0, 255, 0};
+
     ProgressBar pb;
-    int counter = 100;
+    int counter = 99;
 
     SharedPreferences sharedPreferences;
 
@@ -37,10 +46,9 @@ public class MainActivity extends AppCompatActivity {
         counter = sharedPreferences.getInt(LAST_CLOSE_COUNTER_VALUE, 100);
         int elapsedTime = calculateElapsedTime();
 
-        if(elapsedTime>=100) {
+        if (elapsedTime >= 100) {
             counter = 0;
-        }
-        else {
+        } else {
             counter = counter - elapsedTime;
         }
         prog();
@@ -51,16 +59,22 @@ public class MainActivity extends AppCompatActivity {
 
         final Timer t = new Timer();
         TimerTask tt = new TimerTask() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
                 pb.setProgress(counter);
 
                 if (counter == 0) {
 //                    t.cancel();
-                    counter=100;
+                    counter = 99;
+                    healthBarRGB[0] = 0;
+                    healthBarRGB[1] = 255;
                     //roslinka zdycha
+                } else {
+                    counter--;
+
                 }
-                else counter--;
+                updateHPBarColor();
             }
         };
 
@@ -106,5 +120,21 @@ public class MainActivity extends AppCompatActivity {
         return (int) ((time2 - time1) / 1000);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void updateHPBarColor() {
+        if (counter < 25) {
+            healthBarRGB[1] = 128 * ((counter % 25.f)/25);
+        } else if (counter < 50) {
+            healthBarRGB[0] = 255 - (128 * ((counter % 25.f)/25));
+        } else if (counter < 75) {
+            healthBarRGB[1] = 128 + (128 * ((counter % 25.f)/25));
+        } else {
+            healthBarRGB[0] = 128 - (128 * ((counter % 25.f)/25));
+        }
+        pb.getProgressDrawable().setColorFilter(
+                Color.valueOf(healthBarRGB[0]/255.f, healthBarRGB[1]/255.f, healthBarRGB[2]/255.f,1.f).toArgb(),
+                android.graphics.PorterDuff.Mode.SRC_IN
+        );
+    }
 
 }

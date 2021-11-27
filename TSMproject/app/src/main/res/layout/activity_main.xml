@@ -44,7 +44,8 @@
         app:backgroundTint="#004400"
         app:cornerRadius="20dp"
         app:strokeColor="#003300"
-        app:strokeWidth="8dp" />
+        app:strokeWidth="8dp"
+        tools:ignore="PxUsage" />
         tools:ignore="HardcodedText" />
 
     <Button
@@ -90,6 +91,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"
+        android:scaleY="2"
         tools:ignore="MissingConstraints" />
 
 
