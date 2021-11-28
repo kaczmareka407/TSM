@@ -5,13 +5,14 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
-import android.graphics.BlendMode;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -29,26 +30,34 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
 
     public static final String LAST_CLOSE_COUNTER_VALUE = "lastCloseCounterValue";
     public static final String LAST_CLOSE_DATE = "lastCloseDate";
-    public static final int TIME_PERIOD = 100;
+    public static final int TIME_PERIOD = 1000;
     public static final String MY_PREFS = "myPrefs";
+    public static final String FREEZE_TIME = "freezeTime";
+    public static final String FREEZE_COUNTER = "freezeCounter";
+    public static final int SECONDS = 1;
+    public static final int COUNTER_DEFAULT_VALUE = SECONDS * 100;
+    public static final int FREEZE_COUNTER_DEFAULT_VALUE = 1 * 20;
+    public static final String REWARDER_INTERSTITIAL_AD_ID = "ca-app-pub-3940256099942544/5354046379";
+    public static final int REWARD_COLOR = 0xff0047a3;
+    public static final int DEFAULT_COLOR = 0xff004400;
+    public static final int DEFEAT_COLOR = 0xff6b0404;
 
     private final float healthBarRGB[] = {0, 1.f, 0};
 
-    private RewardedInterstitialAd rewardedInterstitialAd;
-
-
+    RewardedInterstitialAd rewardedInterstitialAd;
     ProgressBar pb;
     AdView adView;
     AdRequest adRequest;
     Button buttonWater;
     Button buttonMagicWater;
-    int counter = 99;
+    SharedPreferences sharedPreferences;
+    TextView freezeTimerTextField;
+
+    int counter;
+    int freezeCounter;
     boolean freezeTime = false;
 
-    SharedPreferences sharedPreferences;
-
-
-
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,49 +69,57 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         adView.loadAd(adRequest);
 
         loadAd();
+        loadData();
 
-
-        sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE);
-
-//        sharedPreferences.edit().clear();
-//        sharedPreferences.edit().commit();
-
-        counter = sharedPreferences.getInt(LAST_CLOSE_COUNTER_VALUE, 100);
         int elapsedTime = calculateElapsedTime();
-
-        if (elapsedTime >= 100) {
-            counter = 0;
+        if (freezeTime) {
+            freezeCounter -= elapsedTime;
+            setFreezeTimerTextValue();
+            pb.setProgress(counter);
+            setPremiumRewardUiColors();
         } else {
-            counter = counter - elapsedTime;
+            setDefaultUiColors();
+            if (elapsedTime >= COUNTER_DEFAULT_VALUE) {
+                counter = 0;
+            } else {
+                counter = counter - elapsedTime;
+            }
         }
         prog();
     }
 
     public void prog() {
-        pb = (ProgressBar) findViewById(R.id.pb);
+
 
         final Timer t = new Timer();
         TimerTask tt = new TimerTask() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
-                pb.setProgress(counter);
-
-                if (counter == 0) {
-//                    t.cancel();
-                    counter = 99;
-                    healthBarRGB[0] = 0;
-                    healthBarRGB[1] = 1.f;
-                    //roslinka zdycha
+                if (freezeTime) {
+                    if (freezeCounter == 0) {
+                        freezeTime = false;
+                        freezeTimerTextField.setText("");
+                        setDefaultUiColors();
+                    } else {
+                        freezeCounter--;
+                        setFreezeTimerTextValue();
+                    }
+                } else {
+                    pb.setProgress(counter);
+                    if (counter == 0) {
+                        setDefeatUiColors();
+//                        counter = COUNTER_DEFAULT_VALUE; // to potem wywalić
+//                        healthBarRGB[0] = 0;
+//                        healthBarRGB[1] = 1.f;
+                        //roslinka zdycha
+                    } else {
+                        counter--;
+                    }
+                    updateHPBarColor();
                 }
-                else {
-                    counter--;
-
-                }
-                updateHPBarColor();
             }
         };
-
         t.schedule(tt, 0, TIME_PERIOD);
     }
 
@@ -116,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
 
         editor.putString(LAST_CLOSE_DATE, timeStamp); // zapis aktualnej daty
         editor.putInt(LAST_CLOSE_COUNTER_VALUE, counter); // zapis aktualnego stanu licznika
+        editor.putBoolean(FREEZE_TIME, freezeTime);
+        editor.putInt(FREEZE_COUNTER, freezeCounter);
         editor.apply();
 
         super.onPause();
@@ -142,21 +161,21 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         long time2 = Timestamp.valueOf(currentTimestamp).getTime();
 
         //czas w sekundach
-        return (int) ((time2 - time1) / 1000);
+        return (int) ((time2 - time1) / TIME_PERIOD);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateHPBarColor() {
-        healthBarRGB[0] = 1 - (counter/100.f);
-        healthBarRGB[1] = counter/100.f;
+        healthBarRGB[0] = 1 - (counter / 100.f);
+        healthBarRGB[1] = counter / 100.f;
         pb.getProgressDrawable().setColorFilter(
-                Color.valueOf(healthBarRGB[0], healthBarRGB[1], healthBarRGB[2],1.f).toArgb(),
+                Color.valueOf(healthBarRGB[0], healthBarRGB[1], healthBarRGB[2], 1.f).toArgb(),
                 android.graphics.PorterDuff.Mode.SRC_IN
         );
     }
 
     private void loadAd() {
-        RewardedInterstitialAd.load(this, "ca-app-pub-3940256099942544/5354046379", adRequest, new RewardedInterstitialAdLoadCallback(){
+        RewardedInterstitialAd.load(this, REWARDER_INTERSTITIAL_AD_ID, adRequest, new RewardedInterstitialAdLoadCallback() {
             @Override
             public void onRewardedInterstitialAdLoaded(@NonNull RewardedInterstitialAd ad) {
                 rewardedInterstitialAd = ad;
@@ -164,53 +183,62 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         });
     }
 
-
-    /*
-    *
-    * Dodane
-    *
-    * */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public void magicWater(View view) {
-        rewardedInterstitialAd.show(this,this);
-        adRequest = new AdRequest.Builder().build();
-        loadAd();
-        freezeTime = true;
-        buttonWater = findViewById(R.id.button_magic_water); //
-       //////// buttonWater.setBackgroundColor(Integer.parseInt("#000044")); //tu ma byc zmiana koloru
-
-    /*
-    *
-    *
-    * A tu zamrozenie progressbaru i odliczanie czasu zeby wznowic go i ustawic na wczesniejszy kolor przycisk
-    *
-    *
-    * */
-        sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE);
-//        sharedPreferences.edit().clear();
-//        sharedPreferences.edit().commit();
-        counter = sharedPreferences.getInt(LAST_CLOSE_COUNTER_VALUE, 10);
-        int elapsedTime = calculateElapsedTime();
-        if (elapsedTime >= 10) {
-            counter = 0;
-            freezeTime=false;
-
-            /////// //buttonWater.setBackgroundColor(Integer.parseInt("#004400"));
-        } else {
-            counter = counter - elapsedTime;
-
+        if(!freezeTime) {
+            loadAd();
+            freezeTime = true;
+            rewardedInterstitialAd.show(this, this);
+            adRequest = new AdRequest.Builder().build();
         }
-
     }
+
     public void water(View view) {
-        if(!freezeTime) counter+=30; //dziala xd
+        if (!freezeTime) counter += 30; //dziala xd
     }
 
     @Override
     public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
-//        TIME_PERIOD = 10000;
         System.out.println("NAGRODA");
+        freezeTime = true;
+        freezeCounter = FREEZE_COUNTER_DEFAULT_VALUE;
+        setPremiumRewardUiColors();
     }
 
+    private void setFreezeTimerTextValue() {
+        String s = freezeCounter / 3600 + "h " + (freezeCounter % 3600) / 60 + "m " + (freezeCounter % 3600) % 60+"s";
+        freezeTimerTextField.setText(s);
+    }
 
+    private void loadData() {
+        sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+
+        counter = sharedPreferences.getInt(LAST_CLOSE_COUNTER_VALUE, COUNTER_DEFAULT_VALUE);
+        freezeTime = sharedPreferences.getBoolean(FREEZE_TIME, false);
+        freezeCounter = sharedPreferences.getInt(FREEZE_COUNTER, FREEZE_COUNTER_DEFAULT_VALUE);
+        pb = (ProgressBar) findViewById(R.id.pb);
+        buttonMagicWater = findViewById(R.id.button_magic_water);
+        buttonWater = findViewById(R.id.button_water);
+        freezeTimerTextField = (TextView) findViewById(R.id.freezeTimerTextField);
+    }
+
+    private void setPremiumRewardUiColors() {
+        buttonWater.setBackgroundColor(REWARD_COLOR);
+
+        buttonMagicWater.setBackgroundColor(REWARD_COLOR);
+
+        pb.getProgressDrawable().setColorFilter(REWARD_COLOR, PorterDuff.Mode.SRC_IN);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setDefaultUiColors() {
+        buttonWater.setBackgroundColor(DEFAULT_COLOR);
+        buttonMagicWater.setBackgroundColor(DEFAULT_COLOR);
+        updateHPBarColor();
+    }
+
+    private void setDefeatUiColors() {
+        buttonWater.setBackgroundColor(DEFEAT_COLOR);
+        buttonMagicWater.setBackgroundColor(DEFEAT_COLOR);
+    }
 }
