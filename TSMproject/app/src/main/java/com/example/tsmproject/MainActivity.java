@@ -5,10 +5,12 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.graphics.BlendMode;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.ads.AdRequest;
@@ -38,9 +40,14 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
     ProgressBar pb;
     AdView adView;
     AdRequest adRequest;
+    Button buttonWater;
+    Button buttonMagicWater;
     int counter = 99;
+    boolean freezeTime = false;
 
     SharedPreferences sharedPreferences;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         setContentView(R.layout.activity_main);
 
         adView = (AdView) findViewById(R.id.adView);
-
         MobileAds.initialize(this);
         adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
@@ -88,7 +94,8 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
                     healthBarRGB[0] = 0;
                     healthBarRGB[1] = 1.f;
                     //roslinka zdycha
-                } else {
+                }
+                else {
                     counter--;
 
                 }
@@ -157,10 +164,46 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         });
     }
 
+
+    /*
+    *
+    * Dodane
+    *
+    * */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public void magicWater(View view) {
         rewardedInterstitialAd.show(this,this);
         adRequest = new AdRequest.Builder().build();
         loadAd();
+        freezeTime = true;
+        buttonWater = findViewById(R.id.button_magic_water); //
+       //////// buttonWater.setBackgroundColor(Integer.parseInt("#000044")); //tu ma byc zmiana koloru
+
+    /*
+    *
+    *
+    * A tu zamrozenie progressbaru i odliczanie czasu zeby wznowic go i ustawic na wczesniejszy kolor przycisk
+    *
+    *
+    * */
+        sharedPreferences = getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+//        sharedPreferences.edit().clear();
+//        sharedPreferences.edit().commit();
+        counter = sharedPreferences.getInt(LAST_CLOSE_COUNTER_VALUE, 10);
+        int elapsedTime = calculateElapsedTime();
+        if (elapsedTime >= 10) {
+            counter = 0;
+            freezeTime=false;
+
+            /////// //buttonWater.setBackgroundColor(Integer.parseInt("#004400"));
+        } else {
+            counter = counter - elapsedTime;
+
+        }
+
+    }
+    public void water(View view) {
+        if(!freezeTime) counter+=30; //dziala xd
     }
 
     @Override
@@ -168,5 +211,6 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
 //        TIME_PERIOD = 10000;
         System.out.println("NAGRODA");
     }
+
 
 }
