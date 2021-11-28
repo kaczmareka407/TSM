@@ -185,28 +185,41 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public void magicWater(View view) {
-        if(!freezeTime) {
+        if (!freezeTime) {
             loadAd();
-            freezeTime = true;
+            if (counter > 0) {
+                freezeTime = true;
+            }
             rewardedInterstitialAd.show(this, this);
             adRequest = new AdRequest.Builder().build();
         }
     }
 
     public void water(View view) {
-        if (!freezeTime) counter += 30; //dziala xd
+        if (!freezeTime && counter > 0) {
+            counter += 30; //dziala xd
+        }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
-        System.out.println("NAGRODA");
-        freezeTime = true;
-        freezeCounter = FREEZE_COUNTER_DEFAULT_VALUE;
-        setPremiumRewardUiColors();
+        if (counter > 0) {
+            System.out.println("NAGRODA");
+            freezeTime = true;
+            freezeCounter = FREEZE_COUNTER_DEFAULT_VALUE;
+            setPremiumRewardUiColors();
+        } else {
+            counter = 100;
+            freezeTime = false;
+            setDefaultUiColors();
+
+        }
+
     }
 
     private void setFreezeTimerTextValue() {
-        String s = freezeCounter / 3600 + "h " + (freezeCounter % 3600) / 60 + "m " + (freezeCounter % 3600) % 60+"s";
+        String s = freezeCounter / 3600 + "h " + (freezeCounter % 3600) / 60 + "m " + (freezeCounter % 3600) % 60 + "s";
         freezeTimerTextField.setText(s);
     }
 
@@ -233,12 +246,16 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setDefaultUiColors() {
         buttonWater.setBackgroundColor(DEFAULT_COLOR);
+        buttonWater.setText("WATER");
         buttonMagicWater.setBackgroundColor(DEFAULT_COLOR);
+        buttonMagicWater.setText("MAGIC WATER");
         updateHPBarColor();
     }
 
     private void setDefeatUiColors() {
         buttonWater.setBackgroundColor(DEFEAT_COLOR);
+        buttonWater.setText("-");
         buttonMagicWater.setBackgroundColor(DEFEAT_COLOR);
+        buttonMagicWater.setText("NEW PLANT");
     }
 }
