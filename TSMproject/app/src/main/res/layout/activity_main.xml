@@ -79,23 +79,43 @@
         tools:ignore="HardcodedText" />
 
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/aliveFlower"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:scaleX="1.25"
+        android:scaleY="1.25"
+        android:visibility="visible"
         android:contentDescription="@null"
-        app:srcCompat="@drawable/flower_example"
+        app:srcCompat="@drawable/alive_flower"
         tools:ignore="ImageContrastCheck,ImageContrastCheck" />
+
+    <ImageView
+        android:id="@+id/deadFlower"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleX="1.25"
+        android:scaleY="1.25"
+        android:visibility="invisible"
+        android:contentDescription="@null"
+        app:srcCompat="@drawable/dead_flower"
+        tools:ignore="ImageContrastCheck,ImageContrastCheck" />
+
     <TextView
         android:id="@+id/freezeTimerTextField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scaleX="1.25"
+        android:scaleY="1.25"
         android:layout_below="@id/pb"
         android:gravity="center"
         android:text="."
         android:textSize="30dp"
         android:textColor="@color/white"
         />
+
+
     <ProgressBar
         android:id="@+id/pb"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
