@@ -7,12 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -54,8 +52,6 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
     Button buttonMagicWater;
     SharedPreferences sharedPreferences;
     TextView freezeTimerTextField;
-    ImageView deadFlower;
-    ImageView aliveFlower;
 
     int counter;
     int freezeCounter;
@@ -101,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
             @Override
             public void run() {
                 if (freezeTime) {
-                    showAliveFlower(true);
                     if (freezeCounter == 0) {
                         freezeTime = false;
                         freezeTimerTextField.setText("");
@@ -114,13 +109,11 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
                     pb.setProgress(counter);
                     if (counter == 0) {
                         setDefeatUiColors();
-                        showAliveFlower(false);
 //                        counter = COUNTER_DEFAULT_VALUE; // to potem wywalić
 //                        healthBarRGB[0] = 0;
 //                        healthBarRGB[1] = 1.f;
                         //roslinka zdycha
                     } else {
-                        showAliveFlower(true);
                         counter--;
                     }
                     updateHPBarColor();
@@ -264,24 +257,5 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         buttonWater.setText("-");
         buttonMagicWater.setBackgroundColor(DEFEAT_COLOR);
         buttonMagicWater.setText("NEW PLANT");
-    }
-
-    private void showAliveFlower(boolean x)
-    {
-        deadFlower = findViewById(R.id.deadFlower);
-        aliveFlower = findViewById(R.id.aliveFlower);
-
-        if(x)
-        {
-            aliveFlower .setVisibility(View.VISIBLE);
-            deadFlower .setVisibility(View.INVISIBLE);
-           // deadFlower.willNotDraw();
-        }
-        else
-        {
-            deadFlower .setVisibility(View.VISIBLE);
-           aliveFlower .setVisibility(View.INVISIBLE);
-
-        }
     }
 }
