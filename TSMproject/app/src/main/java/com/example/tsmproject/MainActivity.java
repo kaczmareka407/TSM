@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
     Button buttonMagicWater;
     SharedPreferences sharedPreferences;
     TextView freezeTimerTextField;
+    ImageView imageView;
 
     int counter;
     int freezeCounter;
@@ -85,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
                 counter = counter - elapsedTime;
             }
         }
+        if (counter < 1) {
+            imageView.setImageResource(R.drawable.dead_flower);
+            setDefeatUiColors();
+        }
         prog();
     }
 
@@ -109,10 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
                     pb.setProgress(counter);
                     if (counter == 0) {
                         setDefeatUiColors();
-//                        counter = COUNTER_DEFAULT_VALUE; // to potem wywalić
-//                        healthBarRGB[0] = 0;
-//                        healthBarRGB[1] = 1.f;
-                        //roslinka zdycha
+                        imageView.setImageResource(R.drawable.dead_flower);
                     } else {
                         counter--;
                     }
@@ -197,7 +200,8 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
 
     public void water(View view) {
         if (!freezeTime && counter > 0) {
-            counter += 30; //dziala xd
+            counter += 30;
+            if (counter > 100) counter = 100;
         }
     }
 
@@ -213,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
             counter = 100;
             freezeTime = false;
             setDefaultUiColors();
-
+            imageView.setImageResource(R.drawable.alive_flower);
         }
 
     }
@@ -233,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
         buttonMagicWater = findViewById(R.id.button_magic_water);
         buttonWater = findViewById(R.id.button_water);
         freezeTimerTextField = (TextView) findViewById(R.id.freezeTimerTextField);
+        imageView = findViewById(R.id.flowerImage);
     }
 
     private void setPremiumRewardUiColors() {

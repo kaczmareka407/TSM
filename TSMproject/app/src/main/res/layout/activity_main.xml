@@ -79,12 +79,14 @@
         tools:ignore="HardcodedText" />
 
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/flowerImage"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
-        app:srcCompat="@drawable/flower_example"
+        android:scaleY="1.25"
+        android:scaleX="1.25"
+        app:srcCompat="@drawable/alive_flower"
         tools:ignore="ImageContrastCheck,ImageContrastCheck" />
     <TextView
         android:id="@+id/freezeTimerTextField"
