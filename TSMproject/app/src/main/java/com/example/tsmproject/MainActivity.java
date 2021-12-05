@@ -2,8 +2,10 @@ package com.example.tsmproject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
     public static final int REWARD_COLOR = 0xff0047a3;
     public static final int DEFAULT_COLOR = 0xff004400;
     public static final int DEFEAT_COLOR = 0xff6b0404;
+    public static final String MAGIC_WATER_MESSAGE = "If you watch an ad your plant will not lose HP for some time";
+    public static final String NEW_PLANT_MESSAGE = "If you watch an ad you will get a new fresh plant";
 
     private final float healthBarRGB[] = {0, 1.f, 0};
 
@@ -189,12 +193,31 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public void magicWater(View view) {
         if (!freezeTime) {
-            loadAd();
-            if (counter > 0) {
-                freezeTime = true;
-            }
-            rewardedInterstitialAd.show(this, this);
-            adRequest = new AdRequest.Builder().build();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true);
+            builder.setTitle("Ad reward confirmation");
+            builder.setMessage(counter>0? MAGIC_WATER_MESSAGE : NEW_PLANT_MESSAGE);
+            builder.setPositiveButton("Confirm",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            loadAd();
+                            if (counter > 0) {
+                                freezeTime = true;
+                            }
+                            rewardedInterstitialAd.show(MainActivity.this, MainActivity.this);
+                            adRequest = new AdRequest.Builder().build();
+                        }
+                    });
+            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
         }
     }
 
@@ -209,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements OnUserEarnedRewar
     @Override
     public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
         if (counter > 0) {
-            System.out.println("NAGRODA");
+//            System.out.println("NAGRODA");
             freezeTime = true;
             freezeCounter = FREEZE_COUNTER_DEFAULT_VALUE;
             setPremiumRewardUiColors();
